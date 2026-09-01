@@ -293,7 +293,7 @@ p { margin: 0 0 0.6em; }
 .close-up {
   display: grid;
   grid-template-columns: 176px 1fr;
-  align-items: end;
+  align-items: center;
   gap: 12px;
   width: 100%;
   text-align: left;
@@ -335,6 +335,7 @@ p { margin: 0 0 0.6em; }
 .close-up-copy {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 6px;
   min-width: 0;
 }
