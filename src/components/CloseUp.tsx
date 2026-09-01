@@ -3,7 +3,7 @@ import { pickTap } from '../data/homeFlavor'
 import { asset } from '../lib/asset'
 import { intimacyBand } from '../lib/level'
 
-const TOUCH_SPRITE = asset('sprites/jjik-touch.png')
+const TOUCH_SPRITE = `${asset('sprites/jjik-touch.png')}?v=5`
 
 export function CloseUp({ ratio }: { ratio: number }) {
   const band = intimacyBand(ratio)
