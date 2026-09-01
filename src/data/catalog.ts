@@ -10,6 +10,7 @@
  * unlockLevel 은 그 레벨부터 상점·목장·동료에 나타납니다.
  */
 
+import { asset } from '../lib/asset'
 import type { CompanionDef, CompanionPerk, ForageItem, ShopConsumable } from '../types'
 
 /** 만렙. 세 스탯이 현재 최댓값에 닿으면 1씩 오릅니다. */
@@ -34,7 +35,7 @@ export const RANCH_REVEAL_MS = 4000
  * 목장일 로딩 그림. public/ranch 에서 같은 이름으로 PNG/SVG를 바꾸면 됩니다.
  * 장 수를 늘리거나 줄이려면 이 배열만 고치면 됩니다.
  */
-export const RANCH_LOAD_IMAGES = ['/ranch/load-1.svg', '/ranch/load-2.svg', '/ranch/load-3.svg']
+export const RANCH_LOAD_IMAGES = ['ranch/load-1.svg', 'ranch/load-2.svg', 'ranch/load-3.svg'].map(asset)
 
 /** 수집품을 팔 때 희귀도별 기본 은화. 아이템에 sell을 적으면 그 값이 이깁니다. */
 export const SELL_BY_RARITY: Record<ForageItem['rarity'], number> = {
@@ -87,16 +88,16 @@ export const PERK_LABEL: Record<CompanionPerk, string> = {
   sell: '수집품을 팔 때 개당 은화 +1.',
 }
 
-const PNG_ITEMS = new Set(['tortilla', 'anointing-oil', 'pray'])
+const PNG_ITEMS = new Set(['tortilla', 'anointing-oil', 'pray', 'alabaster'])
 const PNG_PALS = new Set(['lamb', 'dove', 'peter', 'mary', 'simon', 'kyungda', 'gomda'])
 
 function itemImg(id: string, file = id) {
   const ext = PNG_ITEMS.has(file) || PNG_ITEMS.has(id) ? 'png' : 'svg'
-  return `/items/${file}.${ext}`
+  return asset(`items/${file}.${ext}`)
 }
 
 function palImg(id: string) {
-  return PNG_PALS.has(id) ? `/companions/${id}.png` : `/companions/${id}.svg`
+  return asset(PNG_PALS.has(id) ? `companions/${id}.png` : `companions/${id}.svg`)
 }
 
 /** 상점 소모품 */
@@ -516,7 +517,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'common',
     unlockLevel: 1,
     blurb: '호산나, 하며 흔들던 푸른 가지.',
-    image: '/items/palm-branch.svg',
+    image: itemImg('palm-branch'),
   },
   {
     id: 'glitter',
@@ -524,7 +525,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'common',
     unlockLevel: 1,
     blurb: '무대 조명 아래 흩날리던 가루. 슈퍼스타의 잔상.',
-    image: '/items/glitter.svg',
+    image: itemImg('glitter'),
   },
   {
     id: 'mustard-seed',
@@ -532,7 +533,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'common',
     unlockLevel: 1,
     blurb: '아주 작지만, 심으면 새가 깃들 나무가 됩니다.',
-    image: '/items/mustard-seed.svg',
+    image: itemImg('mustard-seed'),
   },
   {
     id: 'loaves-fish',
@@ -540,7 +541,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'common',
     unlockLevel: 1,
     blurb: '오천 명을 먹이던 도시락. 나눠도 줄어들지 않는 온기.',
-    image: '/items/loaves-fish.svg',
+    image: itemImg('loaves-fish'),
   },
   {
     id: 'fig',
@@ -548,7 +549,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'common',
     unlockLevel: 2,
     blurb: '길가의 달콤한 열매. 잎만 무성했던 나무는 아닙니다.',
-    image: '/items/fig.svg',
+    image: itemImg('fig'),
   },
   {
     id: 'olive-leaf',
@@ -556,7 +557,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'common',
     unlockLevel: 3,
     blurb: '겟세마네 밤바람을 머금은 은빛 잎사귀.',
-    image: '/items/olive-leaf.svg',
+    image: itemImg('olive-leaf'),
   },
   {
     id: 'wool',
@@ -564,7 +565,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'common',
     unlockLevel: 4,
     blurb: '목장에서 빗질해 모은 부드러운 뭉치.',
-    image: '/items/wool.svg',
+    image: itemImg('wool'),
   },
   {
     id: 'wine',
@@ -572,7 +573,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'uncommon',
     unlockLevel: 5,
     blurb: '물이 변해 담긴 잔. 혼인 잔치의 마지막이 가장 좋습니다.',
-    image: '/items/wine.svg',
+    image: itemImg('wine'),
   },
   {
     id: 'whip',
@@ -580,7 +581,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'uncommon',
     unlockLevel: 6,
     blurb: '성전 뜰을 맑게 하던 끈. 지금은 목장 울타리를 다듬습니다.',
-    image: '/items/whip.svg',
+    image: itemImg('whip'),
   },
   {
     id: 'net',
@@ -588,7 +589,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'uncommon',
     unlockLevel: 8,
     blurb: '사람을 낚던 그물. 물기가 아직 남아 있습니다.',
-    image: '/items/net.svg',
+    image: itemImg('net'),
   },
   {
     id: 'towel',
@@ -596,7 +597,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'uncommon',
     unlockLevel: 10,
     blurb: '허리에 두르고 무릎을 꿇던 흰 수건.',
-    image: '/items/towel.svg',
+    image: itemImg('towel'),
   },
   {
     id: 'manna',
@@ -604,7 +605,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'uncommon',
     unlockLevel: 12,
     blurb: '이슬이 걷힌 자리에 남은 하얀 조각.',
-    image: '/items/manna.svg',
+    image: itemImg('manna'),
   },
   {
     id: 'mite',
@@ -612,7 +613,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'uncommon',
     unlockLevel: 14,
     blurb: '전부였던 작은 동전 두 닢.',
-    image: '/items/mite.svg',
+    image: itemImg('mite'),
   },
   {
     id: 'donkey',
@@ -620,7 +621,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'uncommon',
     unlockLevel: 16,
     blurb: '종려 길을 걸어가던 작은 발걸음 소리.',
-    image: '/items/donkey.svg',
+    image: itemImg('donkey'),
   },
   {
     id: 'staff',
@@ -628,7 +629,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'uncommon',
     unlockLevel: 18,
     blurb: '양을 이끌 때 짚는 매끈한 나무 막대.',
-    image: '/items/staff.svg',
+    image: itemImg('staff'),
   },
   {
     id: 'raptor',
@@ -636,7 +637,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'rare',
     unlockLevel: 20,
     blurb: '슈퍼스타 무대의 거친 함성이 깃든 작은 공룡.',
-    image: '/items/raptor.svg',
+    image: itemImg('raptor'),
   },
   {
     id: 'thorn-crown',
@@ -644,7 +645,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'rare',
     unlockLevel: 22,
     blurb: '가시가 아직 푸른 고리. 무겁지 않게, 다만 기억으로.',
-    image: '/items/thorn-crown.svg',
+    image: itemImg('thorn-crown'),
   },
   {
     id: 'alabaster',
@@ -652,7 +653,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'rare',
     unlockLevel: 24,
     blurb: '깨진 옥합. 집 안 가득 향기가 남았습니다.',
-    image: '/items/alabaster.png',
+    image: itemImg('alabaster'),
   },
   {
     id: 'lost-bell',
@@ -660,7 +661,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'rare',
     unlockLevel: 26,
     blurb: '아흔아홉을 두고 찾아 나선 그 하나의 방울.',
-    image: '/items/lost-bell.svg',
+    image: itemImg('lost-bell'),
   },
   {
     id: 'star',
@@ -668,7 +669,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'legendary',
     unlockLevel: 30,
     blurb: '동쪽에서 멈춰 선 빛. 가방 안에서도 희미하게 돕니다.',
-    image: '/items/star.svg',
+    image: itemImg('star'),
   },
   {
     id: 'pearl',
@@ -676,7 +677,7 @@ export const FORAGE_ITEMS: ForageItem[] = [
     rarity: 'legendary',
     unlockLevel: 33,
     blurb: '모든 것을 팔아 산 하나의 진주.',
-    image: '/items/pearl.svg',
+    image: itemImg('pearl'),
   },
 ]
 

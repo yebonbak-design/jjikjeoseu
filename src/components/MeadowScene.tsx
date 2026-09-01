@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import { MOOD_LABEL, spriteFor } from '../lib/mood'
 import type { CompanionDef, Mood } from '../types'
 
@@ -11,7 +12,10 @@ export function MeadowScene({
   speech: string
 }) {
   return (
-    <div className={`grove mood-${mood}`}>
+    <div
+      className={`grove mood-${mood}`}
+      style={{ backgroundImage: `url(${asset('bg/meadow.jpg')})` }}
+    >
       <div className={`stroll stroll-${mood}`}>
         <div className="jjik-talk">
           <p className="jjik-bubble">{speech}</p>

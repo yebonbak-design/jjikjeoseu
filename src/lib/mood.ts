@@ -1,12 +1,13 @@
+import { asset } from './asset'
 import { addDays, todayISO } from './dates'
 import { cellColorForDate } from './progress'
 import type { CellColor, Mood, StudyPost } from '../types'
 
 const SPRITES: Record<Mood, string> = {
-  happy: '/sprites/jjik-happy.png?v=4',
-  neutral: '/sprites/jjik-neutral.png?v=4',
-  sad: '/sprites/jjik-sad.png?v=4',
-  angry: '/sprites/jjik-angry.png?v=4',
+  happy: `${asset('sprites/jjik-happy.png')}?v=4`,
+  neutral: `${asset('sprites/jjik-neutral.png')}?v=4`,
+  sad: `${asset('sprites/jjik-sad.png')}?v=4`,
+  angry: `${asset('sprites/jjik-angry.png')}?v=4`,
 }
 
 export function spriteFor(mood: Mood): string {
