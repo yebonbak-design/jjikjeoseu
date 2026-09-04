@@ -26,8 +26,9 @@ export function emptyPost(): StudyPost {
     youtubeStart: 0,
     youtubeEnd: 0,
     youtubeLoop: false,
-    scripts: [{ id: uid('line'), en: '', ko: '' }],
+    scripts: [{ id: uid('line'), en: '', ko: '', pron: '', note: '' }],
     hideMode: 'both',
+    showPron: true,
     bigGoal: '',
     methods: [{ id: uid('m'), text: '' }],
     startDate: '',
@@ -63,8 +64,26 @@ function migrate(raw: AppData): AppData {
       youtubeStart: p.youtubeStart ?? 0,
       youtubeEnd: p.youtubeEnd ?? 0,
       youtubeLoop: p.youtubeLoop ?? false,
+      showPron: p.showPron ?? true,
+      scripts: (p.scripts ?? []).map((s) => ({
+        ...s,
+        en: s.en ?? '',
+        ko: s.ko ?? '',
+        pron: s.pron ?? '',
+        note: s.note ?? '',
+      })),
     })),
     player,
+  }
+}
+
+export function parseBackup(text: string): AppData | null {
+  try {
+    const raw = JSON.parse(text) as AppData
+    if (!raw || !Array.isArray(raw.posts)) return null
+    return migrate(raw)
+  } catch {
+    return null
   }
 }
 

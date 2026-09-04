@@ -5,17 +5,21 @@ import { SCRIPT_PAGE_SIZE, TAGS } from '../data/catalog'
 import { daysInRange } from '../lib/dates'
 import { uid } from '../lib/ids'
 import { cellColorForDate } from '../lib/progress'
-import { parseBilingualScript } from '../lib/scriptImport'
+import { blankScriptLine, parseBilingualScript } from '../lib/scriptImport'
 import { extractYoutubeId, extractYoutubeStart, formatTimestamp, parseTimestamp } from '../lib/youtube'
 import { useStore } from '../store'
 import type { HideMode, ScriptPair, StudyPost } from '../types'
 
 function lineHasText(line: ScriptPair, hideMode: HideMode) {
-  const en = line.en.trim()
-  const ko = line.ko.trim()
+  const en = (line.en ?? '').trim()
+  const ko = (line.ko ?? '').trim()
   if (hideMode === 'en') return en.length > 0
   if (hideMode === 'ko') return ko.length > 0
   return en.length > 0 || ko.length > 0
+}
+
+function patchLine(scripts: ScriptPair[], id: string, partial: Partial<ScriptPair>) {
+  return scripts.map((s) => (s.id === id ? { ...s, ...partial } : s))
 }
 
 export function EditorPage() {
@@ -84,10 +88,10 @@ export function EditorPage() {
   }
 
   function addLine() {
-    const id = uid('line')
-    patch({ scripts: [...current.scripts, { id, en: '', ko: '' }] })
+    const line = blankScriptLine()
+    patch({ scripts: [...current.scripts, line] })
     setScriptPage(Math.floor(current.scripts.length / SCRIPT_PAGE_SIZE))
-    setEditingLineId(id)
+    setEditingLineId(line.id)
   }
 
   function addMethod() {
@@ -99,13 +103,17 @@ export function EditorPage() {
     void file.text().then((text) => {
       const parsed = parseBilingualScript(text)
       if (parsed.length === 0) {
-        setImportNote('문장 쌍을 찾지 못했습니다. 영어 다음 줄에 한글, 또는 한 줄에 영어 / 한글로 적어 주세요.')
+        setImportNote(
+          '문장을 찾지 못했습니다. 01. [이름] 다음에 영어·한글·발음, 있으면 표현 | 줄을 적어 주세요.',
+        )
         return
       }
       if (mode === 'replace') {
         patch({ scripts: parsed })
       } else {
-        const keep = current.scripts.filter((s) => s.en.trim() || s.ko.trim())
+        const keep = current.scripts.filter(
+          (s) => (s.en ?? '').trim() || (s.ko ?? '').trim() || (s.pron ?? '').trim() || (s.note ?? '').trim(),
+        )
         patch({ scripts: keep.length === 0 ? parsed : [...keep, ...parsed] })
       }
       setScriptPage(0)
@@ -120,7 +128,7 @@ export function EditorPage() {
 
   function clearScripts() {
     if (!window.confirm('스크립트를 모두 지울까요? 다시 가져오거나 직접 적을 수 있습니다.')) return
-    patch({ scripts: [{ id: uid('line'), en: '', ko: '' }] })
+    patch({ scripts: [blankScriptLine()] })
     setScriptPage(0)
     setEditingLineId(null)
     setImportNote('스크립트를 비웠습니다.')
@@ -250,12 +258,19 @@ export function EditorPage() {
                         {m === 'both' ? '둘 다' : m === 'en' ? '영어만' : '한국어만'}
                       </button>
                     ))}
+                    <button
+                      type="button"
+                      className={post.showPron !== false ? 'tiny on' : 'tiny'}
+                      onClick={() => patch({ showPron: post.showPron === false })}
+                    >
+                      발음
+                    </button>
                   </div>
                 </div>
                 <p className="hint">
                   한 페이지에 {SCRIPT_PAGE_SIZE}문장. 입력이 끝나면 대본처럼 보이고, 문장을 누르면 다시 고칠 수 있습니다.
-                  텍스트 파일은 영어 다음 줄에 한글, 또는 <code>영어 / 한글</code> 한 줄 형식입니다. 새로 가져오기는 지금
-                  있는 문장을 지우고 바꿉니다.
+                  팟캐스트 파일은 <code>01. [Sam]</code> 다음에 영어, 한글, 발음, 그리고 있으면{' '}
+                  <code>표현 |</code> 줄을 적으면 됩니다. 표현이 없거나 여러 개여도 됩니다. 화자 줄은 저장하지 않습니다.
                 </p>
                 <div className="file-row">
                   <label className="file-btn">
@@ -291,6 +306,9 @@ export function EditorPage() {
                   {scriptSlice.map((line, idx) => {
                     const n = page * SCRIPT_PAGE_SIZE + idx + 1
                     const editing = editingLineId === line.id || !lineHasText(line, post.hideMode)
+                    const showEn = post.hideMode !== 'ko'
+                    const showKo = post.hideMode !== 'en'
+                    const showPron = post.showPron !== false
                     if (!editing) {
                       return (
                         <button
@@ -301,15 +319,21 @@ export function EditorPage() {
                         >
                           <span className="pair-n">{n}</span>
                           <span className="pair-text">
-                            {post.hideMode !== 'ko' ? (
-                              <span className={line.en.trim() ? 'pair-en' : 'pair-en empty'}>
-                                {line.en.trim() || '영어'}
+                            {showEn ? (
+                              <span className={(line.en ?? '').trim() ? 'pair-en' : 'pair-en empty'}>
+                                {(line.en ?? '').trim() || '영어'}
                               </span>
                             ) : null}
-                            {post.hideMode !== 'en' ? (
-                              <span className={line.ko.trim() ? 'pair-ko' : 'pair-ko empty'}>
-                                {line.ko.trim() || '한글'}
+                            {showKo ? (
+                              <span className={(line.ko ?? '').trim() ? 'pair-ko' : 'pair-ko empty'}>
+                                {(line.ko ?? '').trim() || '한글'}
                               </span>
+                            ) : null}
+                            {showPron && (line.pron ?? '').trim() ? (
+                              <span className="pair-pron">{line.pron.trim()}</span>
+                            ) : null}
+                            {showKo && (line.note ?? '').trim() ? (
+                              <span className="pair-note">{line.note.trim()}</span>
                             ) : null}
                           </span>
                         </button>
@@ -327,31 +351,43 @@ export function EditorPage() {
                       >
                         <span className="pair-n">{n}</span>
                         <div className="pair-lines">
-                          {post.hideMode !== 'ko' ? (
+                          {showEn ? (
                             <textarea
                               autoFocus={editingLineId === line.id}
-                              value={line.en}
+                              value={line.en ?? ''}
                               placeholder="English sentence"
                               onChange={(e) =>
-                                patch({
-                                  scripts: post.scripts.map((s) =>
-                                    s.id === line.id ? { ...s, en: e.target.value } : s,
-                                  ),
-                                })
+                                patch({ scripts: patchLine(post.scripts, line.id, { en: e.target.value }) })
                               }
                             />
                           ) : null}
-                          {post.hideMode !== 'en' ? (
+                          {showKo ? (
                             <textarea
-                              autoFocus={editingLineId === line.id && post.hideMode === 'ko'}
-                              value={line.ko}
+                              autoFocus={editingLineId === line.id && post.hideMode === 'ko' && !showEn}
+                              value={line.ko ?? ''}
                               placeholder="한글 문장"
                               onChange={(e) =>
-                                patch({
-                                  scripts: post.scripts.map((s) =>
-                                    s.id === line.id ? { ...s, ko: e.target.value } : s,
-                                  ),
-                                })
+                                patch({ scripts: patchLine(post.scripts, line.id, { ko: e.target.value }) })
+                              }
+                            />
+                          ) : null}
+                          {showPron ? (
+                            <textarea
+                              className="pair-sub"
+                              value={line.pron ?? ''}
+                              placeholder="발음"
+                              onChange={(e) =>
+                                patch({ scripts: patchLine(post.scripts, line.id, { pron: e.target.value }) })
+                              }
+                            />
+                          ) : null}
+                          {showKo ? (
+                            <textarea
+                              className="pair-sub"
+                              value={line.note ?? ''}
+                              placeholder="부연설명 (없으면 비워 두세요)"
+                              onChange={(e) =>
+                                patch({ scripts: patchLine(post.scripts, line.id, { note: e.target.value }) })
                               }
                             />
                           ) : null}

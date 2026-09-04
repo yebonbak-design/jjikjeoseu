@@ -42,6 +42,7 @@ interface Store {
   buyCompanion: (id: string) => string | null
   sellForage: (id: string, qty?: number) => string | null
   walkForest: () => { ok: false; message: string } | { ok: true; item: ForageItem }
+  replaceData: (next: AppData) => void
 }
 
 const Ctx = createContext<Store | null>(null)
@@ -262,6 +263,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return result
   }, [])
 
+  const replaceData = useCallback((next: AppData) => {
+    setData(next)
+  }, [])
+
   const value = useMemo<Store>(
     () => ({
       data,
@@ -275,6 +280,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       buyCompanion,
       sellForage,
       walkForest,
+      replaceData,
     }),
     [
       data,
@@ -288,6 +294,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       buyCompanion,
       sellForage,
       walkForest,
+      replaceData,
     ],
   )
 

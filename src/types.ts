@@ -16,6 +16,10 @@ export interface ScriptPair {
   id: string
   en: string
   ko: string
+  /** 발음. 없으면 빈 문자열. */
+  pron: string
+  /** 부연설명. 문장마다 없을 수 있으며, 없으면 빈 문자열. */
+  note: string
 }
 
 export interface StudyMethod {
@@ -33,6 +37,8 @@ export interface StudyPost {
   youtubeLoop: boolean
   scripts: ScriptPair[]
   hideMode: HideMode
+  /** 발음 줄을 보여줄지. 영어만·한국어만과 같이 켤 수 있습니다. */
+  showPron: boolean
   bigGoal: string
   methods: StudyMethod[]
   startDate: string
